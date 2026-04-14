@@ -1,50 +1,128 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Eye Tracking App
 
-## Get started
+Aplicativo mobile desenvolvido com React Native e Expo, com foco em detecção facial e rastreamento ocular utilizando a câmera frontal do dispositivo.
 
-1. Install dependencies
+## Sobre o projeto
 
-   ```bash
-   npm install
-   ```
+Este projeto foi desenvolvido como parte de uma iniciação, com o objetivo de estudar visão computacional aplicada a dispositivos móveis. A aplicação utiliza a câmera frontal para detectar o rosto do usuário e identificar a posição aproximada dos olhos em tempo real.
 
-2. Start the app
+Além da captura de imagem, o projeto também explora o uso de processamento de frames e landmarks faciais, permitindo visualizar na tela os pontos detectados correspondentes aos olhos.
 
-   ```bash
-   npx expo start
-   ```
+## Objetivo
 
-In the output, you'll find options to open the app in a
+O objetivo principal deste projeto é investigar a viabilidade de um sistema de eye tracking em ambiente mobile, utilizando bibliotecas compatíveis com React Native.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Tecnologias e versões
 
-## Get a fresh project
+-   Expo: 54.0.33
+    
+-   React: 19.1.0
+    
+-   React Native: 0.81.5
+    
+-   React Native Vision Camera: 4.7.3
+    
+-   React Native Vision Camera Face Detector: 1.10.2
+    
+-   React Native Worklets Core: 1.6.3
+    
+-   TypeScript: 5.9.2
+    
+-   Java: 17.0.12
+    
 
-When you're ready, run:
+## Funcionalidades atuais
 
-```bash
-npm run reset-project
+-   Solicitação de permissão para uso da câmera
+    
+-   Acesso à câmera frontal do dispositivo
+    
+-   Detecção facial em tempo real
+    
+-   Identificação de landmarks faciais
+    
+-   Marcação visual aproximada da posição dos olhos na tela
+    
+-   Exibição das coordenadas detectadas
+    
+
+## Estrutura do projeto
+
+```text
+android/
+app/
+assets/
+components/
+constants/
+hooks/
+scripts/
+app.json
+app.tsx
+babel.config.js
+eslint.config.js
+package.json
+package-lock.json
+tsconfig.json
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Requisitos para execução
 
-## Learn more
+Antes de rodar o projeto, é necessário ter instalado:
 
-To learn more about developing your project with Expo, look at the following resources:
+-   Node.js
+    
+-   Java 17
+    
+-   Android Studio
+    
+-   Android SDK configurado
+    
+-   Dispositivo Android físico ou emulador
+    
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Como executar o projeto
 
-## Join the community
+Instale as dependências:
 
-Join our community of developers creating universal apps.
+```bash
+npm install
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Execute o projeto:
+
+```bash
+npx expo run:android
+```
+
+## Geração do APK
+
+Para gerar um APK de debug localmente:
+
+```bash
+cd android
+.\gradlew assembleDebug
+
+```
+
+O arquivo gerado normalmente estará em:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+## Observações
+
+Como o projeto utiliza bibliotecas nativas para processamento da câmera, a execução não ocorre apenas com Expo Go. Por isso, é necessário realizar a compilação nativa para Android.
+
+## Finalidade acadêmica
+
+Este projeto possui finalidade acadêmica e experimental, sendo utilizado para estudo de integração entre visão computacional, processamento em tempo real e desenvolvimento mobile com React Native.
+
+## Autor
+
+Gabriel Makiyama Nakashima
+
+
+
