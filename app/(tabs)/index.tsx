@@ -1,98 +1,188 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react'
+import { Button, Dimensions, StyleSheet, Text, View } from 'react-native'
+import { Camera, runAsync, useCameraDevice, useCameraPermission, useFrameProcessor } from 'react-native-vision-camera'
+import { useFaceDetector } from 'react-native-vision-camera-face-detector'
+import { Worklets } from 'react-native-worklets-core'
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
-export default function HomeScreen() {
+type EyePoint = {
+  x: number
+  y: number
+}
+
+type FaceData = {
+  detected: boolean
+  leftEye?: EyePoint
+  rightEye?: EyePoint
+  bounds?: any
+}
+
+export default function Index() {
+  const device = useCameraDevice('front')
+  const { hasPermission, requestPermission } = useCameraPermission()
+
+  const [faceData, setFaceData] = useState<FaceData>({
+    detected: false,
+  })
+
+  const { detectFaces, stopListeners } = useFaceDetector({
+    performanceMode: 'accurate',
+    landmarkMode: 'all',
+    classificationMode: 'all',
+    cameraFacing: 'front',
+    autoMode: true,
+    windowWidth: SCREEN_WIDTH,
+    windowHeight: SCREEN_HEIGHT,
+  })
+
+  useEffect(() => {
+    if (!hasPermission) requestPermission()
+  }, [hasPermission, requestPermission])
+
+  useEffect(() => {
+    return () => {
+      stopListeners()
+    }
+  }, [stopListeners])
+
+  const handleDetectedFaces = Worklets.createRunOnJS((faces: any[]) => {
+    if (faces.length > 0) {
+      const face = faces[0]
+
+      const leftEye = face.landmarks?.LEFT_EYE
+      const rightEye = face.landmarks?.RIGHT_EYE
+
+      setFaceData({
+        detected: true,
+        leftEye,
+        rightEye,
+        bounds: face.bounds,
+      })
+    } else {
+      setFaceData({ detected: false })
+    }
+  })
+
+  const frameProcessor = useFrameProcessor((frame) => {
+    'worklet'
+    runAsync(frame, () => {
+      'worklet'
+      const faces = detectFaces(frame)
+      handleDetectedFaces(faces)
+    })
+  }, [detectFaces, handleDetectedFaces])
+
+  if (!hasPermission) {
+    return (
+      <View style={styles.center}>
+        <Text>Permissão de câmera necessária</Text>
+        <Button title="Permitir" onPress={requestPermission} />
+      </View>
+    )
+  }
+
+  if (device == null) {
+    return (
+      <View style={styles.center}>
+        <Text>Buscando câmera...</Text>
+      </View>
+    )
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      <Camera
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={true}
+        frameProcessor={frameProcessor}
+      />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+      {faceData.leftEye && (
+        <View
+          style={[
+            styles.eyeDot,
+            {
+              backgroundColor: 'red',
+              left: faceData.leftEye.x + 10,
+              top: faceData.leftEye.y - 10,
+            },
+          ]}
+        />
+      )}
+
+      {faceData.rightEye && (
+        <View
+          style={[
+            styles.eyeDot,
+            {
+              backgroundColor: 'blue',
+              left: faceData.rightEye.x - 25,
+              top: faceData.rightEye.y - 10,
+            },
+          ]}
+        />
+      )}
+
+      <View style={styles.overlay}>
+        {faceData.detected ? (
+          <>
+            <Text style={styles.statusText}>Rosto Detectado ✅</Text>
+            <Text style={styles.text}>
+              Esquerdo (azul): {faceData.leftEye?.x?.toFixed(0)}, {faceData.leftEye?.y?.toFixed(0)}
+            </Text>
+            <Text style={styles.text}>
+              Direito (vermelho): {faceData.rightEye?.x?.toFixed(0)}, {faceData.rightEye?.y?.toFixed(0)}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.text}>Buscando rosto...</Text>
+        )}
+      </View>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  eyeDot: {
     position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#ff0000',
+    borderWidth: 2,
+    borderColor: 'white',
+    zIndex: 999,
   },
-});
+  overlay: {
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 15,
+    borderRadius: 15,
+    width: '80%',
+  },
+  statusText: {
+    color: '#00ff00',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  text: {
+    color: 'white',
+    fontSize: 14,
+    fontFamily: 'monospace',
+    textAlign: 'center',
+  },
+})
