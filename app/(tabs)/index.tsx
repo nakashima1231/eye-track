@@ -11,6 +11,7 @@ type EyePoint = {
   y: number
 }
 
+// dados do rosto
 type FaceData = {
   detected: boolean
   leftEye?: EyePoint
@@ -20,12 +21,15 @@ type FaceData = {
 
 export default function Index() {
   const device = useCameraDevice('front')
+
   const { hasPermission, requestPermission } = useCameraPermission()
 
+  // coordenada do olho
   const [faceData, setFaceData] = useState<FaceData>({
     detected: false,
   })
 
+  // configuracao do detector
   const { detectFaces, stopListeners } = useFaceDetector({
     performanceMode: 'accurate',
     landmarkMode: 'all',
@@ -46,10 +50,12 @@ export default function Index() {
     }
   }, [stopListeners])
 
+  // recebe o rosto
   const handleDetectedFaces = Worklets.createRunOnJS((faces: any[]) => {
     if (faces.length > 0) {
       const face = faces[0]
 
+      // landmarks do olho
       const leftEye = face.landmarks?.LEFT_EYE
       const rightEye = face.landmarks?.RIGHT_EYE
 
@@ -64,6 +70,8 @@ export default function Index() {
     }
   })
 
+
+  // rodacada frame da camera
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
     runAsync(frame, () => {
@@ -92,6 +100,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      {}
       <Camera
         style={StyleSheet.absoluteFill}
         device={device}
@@ -99,12 +108,13 @@ export default function Index() {
         frameProcessor={frameProcessor}
       />
 
+      {/* ponto azul no olho esquerdo */}
       {faceData.leftEye && (
         <View
           style={[
             styles.eyeDot,
             {
-              backgroundColor: 'red',
+              backgroundColor: 'blue',
               left: faceData.leftEye.x + 10,
               top: faceData.leftEye.y - 10,
             },
@@ -112,12 +122,13 @@ export default function Index() {
         />
       )}
 
+      {/* ponto azul no olho direito */}
       {faceData.rightEye && (
         <View
           style={[
             styles.eyeDot,
             {
-              backgroundColor: 'blue',
+              backgroundColor: 'red',
               left: faceData.rightEye.x - 25,
               top: faceData.rightEye.y - 10,
             },
@@ -125,15 +136,16 @@ export default function Index() {
         />
       )}
 
+      {/* informacoes do rastreamento */}
       <View style={styles.overlay}>
         {faceData.detected ? (
           <>
             <Text style={styles.statusText}>Rosto Detectado ✅</Text>
             <Text style={styles.text}>
-              Esquerdo (azul): {faceData.leftEye?.x?.toFixed(0)}, {faceData.leftEye?.y?.toFixed(0)}
+              Esquerdo (vermelho): {faceData.leftEye?.x?.toFixed(0)}, {faceData.leftEye?.y?.toFixed(0)}
             </Text>
             <Text style={styles.text}>
-              Direito (vermelho): {faceData.rightEye?.x?.toFixed(0)}, {faceData.rightEye?.y?.toFixed(0)}
+              Direito (azul): {faceData.rightEye?.x?.toFixed(0)}, {faceData.rightEye?.y?.toFixed(0)}
             </Text>
           </>
         ) : (
@@ -143,6 +155,7 @@ export default function Index() {
     </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
