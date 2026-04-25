@@ -383,6 +383,40 @@ export default function Index() {
   // Guards de permissão e dispositivo
   // ─────────────────────────────────────────────────────────────────────────
 
+  // tira snapshot da preview da camera e persiste os dados da foto
+  const takePhoto = async () => {
+    if (!cameraRef.current) return
+    try {
+      const photo = await cameraRef.current.takeSnapshot({
+        quality: 90,
+      })
+
+      const uri = `file://${photo.path}`
+
+      setPhotos(prev => [
+        {
+          uri,
+          leftEye: faceData.leftEye,
+          rightEye: faceData.rightEye,
+          leftOffsetX,
+          leftOffsetY,
+          rightOffsetX,
+          rightOffsetY,
+          captureWidth: SCREEN_WIDTH,
+          captureHeight: SCREEN_HEIGHT,
+        },
+        ...prev,
+      ])
+    } catch (e) {
+      console.error('Erro ao tirar snapshot:', e)
+    }
+  }
+
+  // remove uma foto individual do estado e do AsyncStorage
+  const deletePhoto = (uri: string) => {
+    setPhotos(prev => prev.filter(photo => photo.uri !== uri))
+  }
+
   if (!hasPermission) {
     return (
       <View style={styles.center}>
@@ -860,5 +894,211 @@ const styles = StyleSheet.create({
   floatingConfigBtnText: {
     color: 'white',
     fontSize: 20,
+  },
+  // barra superior com galeria e offsets
+  topBar: {
+    position: 'absolute',
+    top: 55,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+  topBtn: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  topBtnText: {
+    color: 'white',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  // botão circular de foto
+  shutterBtn: {
+    position: 'absolute',
+    bottom: 38,
+    alignSelf: 'center',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 4,
+    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  shutterInner: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: 'white',
+  },
+  // painel flutuante de ajuste de offsets
+  controlPanel: {
+    position: 'absolute',
+    top: 110,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    padding: 14,
+    borderRadius: 16,
+    minWidth: 200,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  panelTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  panelSection: {
+    color: '#adf',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    gap: 8,
+  },
+  label: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'monospace',
+    width: 60,
+  },
+  adjBtn: {
+    backgroundColor: '#333',
+    width: 34,
+    height: 34,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#555',
+  },
+  adjBtnText: {
+    color: 'white',
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: 'bold',
+  },
+  resetBtn: {
+    marginTop: 12,
+    backgroundColor: '#444',
+    paddingVertical: 7,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  resetBtnText: {
+    color: '#ffd',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  // galeria de fotos
+  galleryHeader: {
+    backgroundColor: '#111',
+    paddingTop: 55,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  backBtn: {
+    marginRight: 16,
+  },
+  backBtnText: {
+    color: '#4af',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  galleryTitle: {
+    color: 'white',
+    fontSize: 17,
+    fontWeight: 'bold',
+  },
+  galleryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 4,
+  },
+  thumbnailWrapper: {
+    width: THUMB_SIZE,
+    height: THUMB_SIZE,
+    margin: 3,
+    position: 'relative',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 6,
+    backgroundColor: '#222',
+  },
+  // botão de deletar foto individual
+  deleteBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteBtnText: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  emptyText: {
+    color: '#888',
+    fontSize: 15,
+  },
+  viewerContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewerImage: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+  },
+  viewerEyeDot: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: 'white',
+    zIndex: 30,
+  },
+  viewerCloseBtn: {
+    position: 'absolute',
+    top: 55,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  viewerCloseBtnText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
 })
