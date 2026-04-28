@@ -1,6 +1,4 @@
-// components/GazeSessionLogger.tsx
-// [GAZE] Substitui a galeria de fotos por um log de sessões de teste de gaze
-// Registra: zona alvo, zona detectada, acurácia por zona, timestamp
+
 
 import React from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
