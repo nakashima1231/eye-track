@@ -1,11 +1,4 @@
-// hooks/useGazeEstimator.ts
-// [GAZE] Novo módulo — converte landmarks MediaPipe em zona de olhar estimada
-// Não depende de nenhuma biblioteca externa, apenas lógica pura
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Índices do modelo FaceLandmarker 478-pt do MediaPipe
-// Ref: https://github.com/google-ai-edge/mediapipe/blob/master/mediapipe/modules/face_geometry/data/canonical_face_model_uv_visualization.png
-// ─────────────────────────────────────────────────────────────────────────────
+l
 export const FACE_LANDMARKS = {
   // Olho esquerdo (do usuário — câmera frontal espelha)
   LEFT_EYE_OUTER_CORNER: 33,    // canto externo
