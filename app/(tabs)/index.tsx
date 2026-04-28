@@ -1,16 +1,4 @@
-// app/index.tsx
-// [GAZE] Adaptação do app de face tracking para gaze tracking com MediaPipe
-//
-// O que mudou em relação ao original:
-//   REMOVIDO:  react-native-vision-camera-face-detector (MLKit, só 5 landmarks)
-//   ADICIONADO: react-native-mediapipe useFaceLandmarkDetection (478 landmarks + íris)
-//   ADAPTADO:  FaceData → GazeData (inclui posição da íris + resultado de zona)
-//   REMOVIDO:  useFrameProcessor + runAsync + Worklets (o hook do mediapipe já gerencia isso)
-//   MANTIDO:   useCameraDevice, useCameraPermission
-//   MANTIDO:   AsyncStorage para persistência
-//   MANTIDO:   overlay absoluto sobre câmera
-//   SUBSTITUÍDO: galeria de fotos → log de sessões de gaze
-//   SUBSTITUÍDO: painel de offsets → painel de calibração de thresholds
+
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
