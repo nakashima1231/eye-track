@@ -1,6 +1,4 @@
-// components/GazeOverlay.tsx
-// [GAZE] Novo componente — exibe grade 3x3 e destaca zona de olhar atual
-// Substitui os simples eyeDots do overlay original
+
 
 import React, { useEffect, useRef } from 'react'
 import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native'
